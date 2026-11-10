@@ -1,16 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
   <title>Office of Hon. Nolly D. Concepcion - Sangguniang Panlungsod</title>
 
-  <!-- GitHub Pages Relative Favicon Tags -->
+  <!-- GitHub Pages Favicons (Relative URLs) -->
   <link rel="icon" type="image/x-icon" href="./favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
-
-  <!-- Apple Touch & Mobile Home Screen -->
   <link rel="apple-touch-icon" sizes="192x192" href="./favicon-192x192.png" />
+
+  <!-- Tailwind CSS Engine -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React & Babel Standalone (Runs React directly in browser with zero build step) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  </style>
 </head>
+<body class="bg-slate-100 antialiased text-slate-800">
+  <div id="root"></div>
+
+  <!-- Main Application Script -->
+  <script type="text/babel">
+    const { useState } = React;
+
+    // Full 9-Committee Assignment Structure for Hon. Nolly D. Concepcion
+    const COMMITTEES_PROFILE = [
+      { id: 'rules', name: 'Rules, Laws, Ordinances & Privileges', role: 'Chairperson', color: 'bg-amber-600', badge: 'Rules & Laws' },
+      { id: 'safety', name: 'Public Safety, Security and Traffic Management', role: 'Chairperson', color: 'bg-blue-600', badge: 'Safety & Traffic' },
+      { id: 'agri', name: 'Food, Agriculture and Agrarian Reform', role: 'Vice Chairperson', color: 'bg-emerald-600', badge: 'Agriculture' },
+      { id: 'livelihood', name: 'Livelihood and Cooperatives', role: 'Vice Chairperson', color: 'bg-purple-600', badge: 'Livelihood' },
+      { id: 'env', name: 'Environmental Management, Protection and Natural Resources', role: 'Vice Chairperson', color: 'bg-teal-600', badge: 'Environment' },
+      { id: 'markets', name: 'Markets and Slaughterhouses', role: 'Vice Chairperson', color: 'bg-rose-600', badge: 'Markets' },
+      { id: 'works', name: 'Public Utilities, Facilities & Public Works', role: 'Member', color: 'bg-slate-600', badge: 'Public Works' },
+      { id: 'trade', name: 'Trade, Commerce, and Industry', role: 'Member', color: 'bg-indigo-600', badge: 'Trade & Commerce' },
+      { id: 'oversight', name: 'Legislative Backstopping and Oversight', role: 'Member', color: 'bg-cyan-700', badge: 'Oversight' }
+    ];
+
+    const INITIAL_DOCKET = [
+      {
+        measureNo: 'ORD-2026-022',
+        title: 'City Traffic Demarcation & No-Obstruction Corridor Along Main Arterial Roads (Quirino Hwy & Muzon Junction)',
+        committee: 'Public Safety, Security and Traffic Management',
+        committeeCode: 'safety',
+        role: 'Chairperson',
+        type: 'Ordinance',
+        stage: '2nd Reading Pending',
+        status: 'Committee Hearing',
+        sponsor: 'Hon. Nolly D. Concepcion',
+        calendarDate: 'Nov 12, 2026',
+        notes: 'Awaiting feedback from POSO, Traffic Bureau, and Tricycle Operators Federation.',
+        pdfTitle: 'ORD-2026-022_Draft_Committee_Report.pdf'
+      },
+      {
+        measureNo: 'RES-2026-105',
+        title: 'Review and Harmonization of Sangguniang Panlungsod Internal Rules of Procedure (IRP)',
+        committee: 'Rules, Laws, Ordinances & Privileges',
+        committeeCode: 'rules',
+        role: 'Chairperson',
+        type: 'Resolution',
+        stage: 'Ready for Plenary',
+        status: 'For 3rd Reading',
+        sponsor: 'Hon. Nolly D. Concepcion',
+        calendarDate: 'Nov 17, 2026',
+        notes: 'Standardized digital session packets and roll-call voting quorum rules.',
+        pdfTitle: 'RES-2026-105_Internal_Rules_Procedure.pdf'
+      },
+      {
+        measureNo: 'REV-2026-041',
+        title: 'Legal Sufficiency Review: Barangay Kaypian Revised Local Revenue Code Series 2026',
+        committee: 'Rules, Laws, Ordinances & Privileges',
+        committeeCode: 'rules',
+        role: 'Chairperson',
+        type: 'Legal Review',
+        stage: 'Committee Report Prepared',
+        status: 'Endorsed for Plenary',
+        sponsor: 'Hon. Nolly D. Concepcion',
+        calendarDate: 'Nov 24, 2026',
+        notes: 'Declared intra-vires and consistent with Local Government Code (RA 7160).',
+        pdfTitle: 'REV-2026-041_Legal_Sufficiency_Report.pdf'
+      },
+      {
+        measureNo: 'ORD-2026-031',
+        title: 'Institutionalization of Organic Fertilizer & Cold Storage Support for Upland Farmers',
+        committee: 'Food, Agriculture and Agrarian Reform',
+        committeeCode: 'agri',
+        role: 'Vice Chairperson',
+        type: 'Ordinance',
+        stage: 'Referred to Committee',
+        status: 'Technical Working Group',
+        sponsor: 'Hon. Nolly D. Concepcion (Co-Sponsor)',
+        calendarDate: 'Nov 28, 2026',
+        notes: 'TWG session with City Agriculture Office and Paradise III Farmer Beneficiaries.',
+        pdfTitle: 'ORD-2026-031_Agri_Cold_Storage.pdf'
+      },
+      {
+        measureNo: 'RES-2026-118',
+        title: 'Inquiry on Upgraded Sanitation & Wastewater Treatment for Public Slaughterhouse',
+        committee: 'Markets and Slaughterhouses',
+        committeeCode: 'markets',
+        role: 'Vice Chairperson',
+        type: 'Resolution',
+        stage: 'Joint Review',
+        status: 'Inspection Scheduled',
+        sponsor: 'Hon. Nolly D. Concepcion',
+        calendarDate: 'Dec 03, 2026',
+        notes: 'Joint hearing with City Health Office and CENRO.',
+        pdfTitle: 'RES-2026-118_Slaughterhouse_Sanitation.pdf'
+      }
+    ];
+
+    function App() {
+      const [docketData, setDocketData] = useState(INITIAL_DOCKET);
+      const [activeTab, setActiveTab] = useState('docket'); // 'docket' | 'committees' | 'excel'
+      const [roleFilter, setRoleFilter] = useState('all'); // 'all' | 'Chairperson' | 'Vice Chairperson' | 'Member'
+      const [committeeFilter, setCommitteeFilter] = useState('all');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [activePdf, setActivePdf] = useState(null);
+      const [csvInput, setCsvInput] = useState('');
+      const [importMessage, setImportMessage] = useState('');
+
+      const filteredItems = docketData.filter(item => {
+        const matchesRole = roleFilter === 'all' || item.role === roleFilter;
+        const matchesComm = committeeFilter === 'all' || item.committeeCode === committeeFilter;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              item.measureNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              item.notes.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesRole && matchesComm && matchesSearch;
+      });
+
+      const handleImportCsv = () => {
+        if (!csvInput.trim()) {
+          setImportMessage('Please paste rows from your Excel sheet.');
+          return;
+        }
+        try {
+          const lines = csvInput.trim().split('\n');
+          const newRows = [];
+          lines.forEach(l => {
+            const cols = l.split(/[\t,]/).map(s => s.trim().replace(/^"|"$/g, ''));
+            if (cols.length >= 3) {
+              const isRules = cols[2]?.toLowerCase().includes('rule');
+              newRows.push({
+                measureNo: cols[0] || `ORD-2026-${Math.floor(100 + Math.random() * 899)}`,
+                title: cols[1] || 'Imported Legislative Measure',
+                committee: isRules ? 'Rules, Laws, Ordinances & Privileges' : 'Public Safety, Security and Traffic Management',
+                committeeCode: isRules ? 'rules' : 'safety',
+                role: 'Chairperson',
+                type: cols[0]?.startsWith('RES') ? 'Resolution' : 'Ordinance',
+                stage: cols[3] || 'Deliberation',
+                status: cols[4] || 'Docketed',
+                sponsor: 'Hon. Nolly D. Concepcion',
+                calendarDate: cols[5] || 'Upcoming Session',
+                notes: cols[6] || 'Imported from staff Excel tracking worksheet.',
+                pdfTitle: `${cols[0] || 'Measure'}_Official_Copy.pdf`
+              });
+            }
+          });
+          if (newRows.length > 0) {
+            setDocketData([...docketData, ...newRows]);
+            setImportMessage(`Added ${newRows.length} rows to the live app!`);
+            setCsvInput('');
+            setTimeout(() => setActiveTab('docket'), 1000);
+          } else {
+            setImportMessage('Could not parse columns. Make sure you copy at least Measure No, Title, and Committee.');
+          }
+        } catch {
+          setImportMessage('Error processing rows. Check table format.');
+        }
+      };
+
+      const exportCsv = () => {
+        const headers = ["Measure No", "Title", "Committee", "Role", "Stage", "Status", "Calendar Date", "Notes"];
+        const rows = docketData.map(d => [
+          `"${d.measureNo}"`, `"${d.title.replace(/"/g, '""')}"`, `"${d.committee}"`, `"${d.role}"`,
+          `"${d.stage}"`, `"${d.status}"`, `"${d.calendarDate}"`, `"${d.notes.replace(/"/g, '""')}"`
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", "CSJDM_SP_Legislative_Docket.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto min-h-screen bg-white shadow-xl flex flex-col font-sans border-x border-slate-200">
+          
+          {/* EXECUTIVE HEADER */}
+          <header className="bg-slate-900 text-white p-4 border-b-4 border-amber-500 sticky top-0 z-30 shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center space-x-3">
+                
+                {/* Hyperlinked Unframed CSJDM Logo */}
+                <a 
+                  href="https://csjdm.gov.ph/sangguniang-panlungsod/sp-standing-committee/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Official SP Standing Committees - City of San Jose del Monte Portal"
+                  className="group relative flex-shrink-0 transition-transform hover:scale-105 active:scale-95 focus:outline-none"
+                >
+                  <svg className="w-12 h-12" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="48" fill="#a7f3d0" stroke="#15803d" strokeWidth="3"/>
+                    <circle cx="50" cy="50" r="40" fill="#f8fafc" stroke="#166534" strokeWidth="1.5"/>
+                    <path d="M 20 50 A 30 30 0 0 1 80 50 Z" fill="#38bdf8"/>
+                    <path d="M 30 50 L 50 32 L 70 50 Z" fill="#22c55e"/>
+                    <circle cx="50" cy="30" r="6" fill="#facc15"/>
+                    <path d="M 22 50 C 22 72, 78 72, 78 50 Z" fill="#db2777"/>
+                    <text x="50" y="58" textAnchor="middle" fill="#ffffff" fontSize="6.5" fontWeight="bold">1752 • 2000</text>
+                    <path d="M 42 62 Q 50 67 58 62 L 50 70 Z" fill="#ffffff"/>
+                    <text x="50" y="14" textAnchor="middle" fill="#14532d" fontSize="5.5" fontWeight="900" letterSpacing="0.2">LUNGSOD NG SAN JOSE DEL MONTE</text>
+                    <text x="50" y="93" textAnchor="middle" fill="#14532d" fontSize="6" fontWeight="bold">BULACAN</text>
+                  </svg>
+                  <span className="absolute -bottom-1 -right-1 bg-amber-500 text-slate-950 text-[9px] font-bold px-1 rounded shadow">↗</span>
+                </a>
+
+                <div>
+                  <div className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider">
+                    Sangguniang Panlungsod • Lungsod ng San Jose del Monte
+                  </div>
+                  <h1 className="text-lg sm:text-xl font-black text-white tracking-tight leading-none mt-0.5">
+                    Hon. Nolly D. Concepcion
+                  </h1>
+                  <p className="text-[11px] text-slate-300 mt-1">
+                    Legislative Tracking Portal & Committee Records
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={exportCsv}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow transition-all"
+                >
+                  <span>Export CSV</span>
+                </button>
+                <span className="bg-slate-800 text-emerald-400 text-[11px] font-mono px-2.5 py-1 rounded-lg border border-slate-700">
+                  ● Ready
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Chairmanship Banners */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-800 text-xs">
+              <div className="bg-slate-800/90 p-2 rounded border-l-4 border-amber-500">
+                <span className="text-[10px] font-bold text-amber-400 block uppercase">Chairperson</span>
+                <span className="text-slate-200 font-medium">Rules, Laws, Ordinances & Privileges</span>
+              </div>
+              <div className="bg-slate-800/90 p-2 rounded border-l-4 border-blue-500">
+                <span className="text-[10px] font-bold text-blue-400 block uppercase">Chairperson</span>
+                <span className="text-slate-200 font-medium">Public Safety, Security & Traffic Management</span>
+              </div>
+            </div>
+          </header>
+
+          {/* WORKSPACE NAVIGATION TABS */}
+          <div className="bg-slate-50 border-b border-slate-200 px-4 pt-2 flex space-x-4 text-xs font-semibold">
+            <button 
+              onClick={() => setActiveTab('docket')}
+              className={`pb-2.5 px-1 border-b-2 transition-all ${
+                activeTab === 'docket' ? 'border-amber-600 text-amber-800' : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Legislative Docket ({filteredItems.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab('committees')}
+              className={`pb-2.5 px-1 border-b-2 transition-all ${
+                activeTab === 'committees' ? 'border-amber-600 text-amber-800' : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              All 9 Committees
+            </button>
+            <button 
+              onClick={() => setActiveTab('excel')}
+              className={`pb-2.5 px-1 border-b-2 transition-all ${
+                activeTab === 'excel' ? 'border-amber-600 text-amber-800' : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Excel Table & Importer
+            </button>
+          </div>
+
+          {/* FILTERS & SEARCH BAR */}
+          <div className="p-3 bg-white border-b border-slate-200 space-y-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input 
+                type="text"
+                placeholder="Search measures, keywords, barangay review notes..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-slate-900"
+              />
+              <select 
+                value={roleFilter}
+                onChange={e => setRoleFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700"
+              >
+                <option value="all">All Roles</option>
+                <option value="Chairperson">Chairperson Only</option>
+                <option value="Vice Chairperson">Vice Chairperson Only</option>
+                <option value="Member">Member Only</option>
+              </select>
+            </div>
+
+            {/* Committee Tag Badges */}
+            <div className="flex space-x-1.5 overflow-x-auto pb-1 text-[11px]">
+              <button 
+                onClick={() => setCommitteeFilter('all')}
+                className={`px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
+                  committeeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                All Committees
+              </button>
+              {COMMITTEES_PROFILE.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => setCommitteeFilter(c.id)}
+                  className={`px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap transition-all ${
+                    committeeFilter === c.id ? `${c.color} text-white` : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {c.badge}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* MAIN TAB BODIES */}
+          <main className="flex-1 p-4 bg-slate-50">
+
+            {/* TAB 1: DOCKET CARDS */}
+            {activeTab === 'docket' && (
+              <div className="space-y-3">
+                {filteredItems.map(item => (
+                  <div key={item.measureNo} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:border-slate-300 transition-all space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-1 text-[11px]">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
+                          {item.measureNo}
+                        </span>
+                        <span className="text-slate-500 font-semibold">{item.type}</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
+                        item.role === 'Chairperson' ? 'bg-amber-600' : item.role === 'Vice Chairperson' ? 'bg-blue-600' : 'bg-slate-600'
+                      }`}>
+                        {item.role}: {item.committee}
+                      </span>
+                    </div>
+
+                    <h3 className="font-bold text-sm text-slate-900 leading-snug">
+                      {item.title}
+                    </h3>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] bg-slate-50 p-2.5 rounded border border-slate-100 text-slate-600">
+                      <div>
+                        <span className="block text-[10px] text-slate-400">Current Stage:</span>
+                        <span className="font-semibold text-slate-800">{item.stage}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-slate-400">Status:</span>
+                        <span className="font-semibold text-slate-800">{item.status}</span>
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <span className="block text-[10px] text-slate-400">Session/Calendar Date:</span>
+                        <span className="font-semibold text-slate-800">{item.calendarDate}</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-50/70 border border-amber-200 rounded p-2 text-xs text-amber-900">
+                      <span className="font-bold text-[10px] text-amber-700 block uppercase">Staff Working Notes:</span>
+                      {item.notes}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                      <span className="text-slate-500 truncate max-w-[220px] text-[11px]">
+                        📄 {item.pdfTitle}
+                      </span>
+                      <button 
+                        onClick={() => setActivePdf(item)}
+                        className="bg-blue-900 hover:bg-blue-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg shadow-sm"
+                      >
+                        Read Official PDF Copy
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* TAB 2: ALL 9 COMMITTEES PROFILE */}
+            {activeTab === 'committees' && (
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <h2 className="font-bold text-sm text-slate-900">Standing Committee Portfolio</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Official assignments for Hon. Nolly D. Concepcion in the Sangguniang Panlungsod.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {COMMITTEES_PROFILE.map((c, i) => (
+                    <div key={c.id} className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between space-y-2">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded text-white ${c.color}`}>
+                            {c.role}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">#{i + 1}</span>
+                        </div>
+                        <h4 className="font-bold text-xs text-slate-900 leading-snug">{c.name}</h4>
+                      </div>
+                      <button 
+                        onClick={() => { setCommitteeFilter(c.id); setActiveTab('docket'); }}
+                        className="w-full text-center py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-[11px] font-semibold text-slate-700"
+                      >
+                        View Measures
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: EXCEL TABLE & IMPORTER */}
+            {activeTab === 'excel' && (
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-slate-900">Spreadsheet Master View</h3>
+                      <p className="text-xs text-slate-500">Live view of data matching your Excel columns</p>
+                    </div>
+                    <button 
+                      onClick={exportCsv}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded"
+                    >
+                      Download CSV
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto border border-slate-200 rounded">
+                    <table className="w-full text-left text-[11px] border-collapse">
+                      <thead className="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold">
+                        <tr>
+                          <th className="p-2 border-r border-slate-200">Measure No.</th>
+                          <th className="p-2 border-r border-slate-200 min-w-[150px]">Title</th>
+                          <th className="p-2 border-r border-slate-200">Role</th>
+                          <th className="p-2 border-r border-slate-200">Stage</th>
+                          <th className="p-2">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {docketData.map(d => (
+                          <tr key={d.measureNo} className="hover:bg-slate-50">
+                            <td className="p-2 font-mono font-bold text-slate-800 border-r border-slate-200 whitespace-nowrap">{d.measureNo}</td>
+                            <td className="p-2 border-r border-slate-200 leading-tight">{d.title}</td>
+                            <td className="p-2 border-r border-slate-200 whitespace-nowrap font-medium">{d.role}</td>
+                            <td className="p-2 border-r border-slate-200 whitespace-nowrap">{d.stage}</td>
+                            <td className="p-2 whitespace-nowrap">{d.calendarDate}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                  <h3 className="font-bold text-sm text-slate-900">Paste Rows from Excel / CSV</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Copy cells directly from Excel (Columns: Measure No | Title | Committee | Stage | Status | Calendar Date | Notes) and paste below:
+                  </p>
+
+                  <textarea 
+                    rows="4"
+                    placeholder={`ORD-2026-040\tInstallation of Warning Signages on Blind Curves\tPublic Safety\t1st Reading\tDeliberation\tDec 05, 2026\tEndorsed by Barangay San Manuel`}
+                    value={csvInput}
+                    onChange={e => setCsvInput(e.target.value)}
+                    className="w-full p-2.5 text-xs font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+
+                  {importMessage && (
+                    <p className={`text-xs p-2 rounded ${importMessage.includes('Added') ? 'bg-emerald-50 text-emerald-800 font-semibold' : 'bg-red-50 text-red-700'}`}>
+                      {importMessage}
+                    </p>
+                  )}
+
+                  <button 
+                    onClick={handleImportCsv}
+                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                  >
+                    Parse Rows & Add to App
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          {/* SIMULATED OFFICIAL LEGISLATIVE PDF MODAL */}
+          {activePdf && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col justify-end p-2 sm:p-6">
+              <div className="bg-white w-full max-w-2xl mx-auto h-[90vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-slate-200">
+                
+                {/* Modal Title Bar */}
+                <div className="bg-slate-900 text-white p-3 flex items-center justify-between border-b border-slate-800">
+                  <div className="flex items-center space-x-2 truncate">
+                    <span className="bg-red-600 text-white font-mono text-[10px] font-bold px-1.5 py-0.5 rounded">PDF</span>
+                    <span className="font-bold text-xs truncate">{activePdf.pdfTitle}</span>
+                  </div>
+                  <button 
+                    onClick={() => setActivePdf(null)}
+                    className="w-7 h-7 bg-slate-800 hover:bg-slate-700 rounded-full flex items-center justify-center text-slate-300 text-xs font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Simulated Official Letterhead Document */}
+                <div className="flex-1 p-6 overflow-y-auto bg-white font-serif text-slate-900 space-y-4">
+                  <div className="text-center border-b pb-3 space-y-0.5">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-600">Republic of the Philippines</p>
+                    <p className="text-xs uppercase font-bold">Province of Bulacan</p>
+                    <p className="text-sm font-black text-slate-900 uppercase">City of San Jose del Monte</p>
+                    <p className="text-xs font-bold text-amber-700 uppercase">Sangguniang Panlungsod</p>
+                    <p className="text-[10px] italic text-slate-500 font-sans mt-1">Office of City Councilor Hon. Nolly D. Concepcion</p>
+                  </div>
+
+                  <div className="text-center py-2">
+                    <h2 className="text-base font-bold uppercase">{activePdf.measureNo}</h2>
+                    <p className="text-xs italic font-sans text-slate-600 mt-1 max-w-lg mx-auto">
+                      "{activePdf.title}"
+                    </p>
+                  </div>
+
+                  <div className="border-t border-b py-2 text-xs font-sans grid grid-cols-2 gap-2 text-slate-700 bg-slate-50 px-3 rounded">
+                    <div><strong>Committee:</strong> {activePdf.committee}</div>
+                    <div><strong>Role:</strong> {activePdf.role}</div>
+                    <div><strong>Current Stage:</strong> {activePdf.stage}</div>
+                    <div><strong>Hearing Date:</strong> {activePdf.calendarDate}</div>
+                  </div>
+
+                  <div className="text-xs leading-relaxed space-y-2 pt-2">
+                    <p className="font-bold font-sans text-[11px] uppercase text-slate-500">Working Excerpt & Legislative Intent:</p>
+                    <p className="indent-6 text-justify">
+                      WHEREAS, in accordance with the legislative mandate of the Sangguniang Panlungsod under the Local Government Code of 1991 (Republic Act No. 7160), this measure has been formally referred to the {activePdf.committee};
+                    </p>
+                    <p className="indent-6 text-justify">
+                      WHEREAS, the Committee has noted and reviewed the administrative details: {activePdf.notes}
+                    </p>
+                  </div>
+
+                  <div className="pt-8 grid grid-cols-2 gap-4 text-center font-sans text-xs">
+                    <div>
+                      <p className="text-slate-400 text-[10px]">Prepared & Attested by:</p>
+                      <p className="font-bold mt-4 border-t border-slate-300 pt-1">Committee Secretariat</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-[10px]">Endorsed by:</p>
+                      <p className="font-bold text-slate-900 mt-4 border-t border-slate-300 pt-1">HON. NOLLY D. CONCEPCION</p>
+                      <p className="text-[10px] text-slate-500">{activePdf.role}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer Actions */}
+                <div className="p-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs font-sans">
+                  <span className="text-[11px] text-slate-500">Official SP Legislative Document Copy</span>
+                  <button 
+                    onClick={() => window.print()}
+                    className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-1.5 rounded-lg"
+                  >
+                    Print Document
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
 </html>

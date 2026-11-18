@@ -115,7 +115,19 @@
         pdfTitle: 'RES-2026-118_Slaughterhouse_Sanitation.pdf'
       }
     ];
-
+const WEEKLY_SESSIONS = [
+      {
+        sessionNo: "46th Regular Session",
+        date: "November 17, 2026",
+        status: "Current Session",
+        orderOfBusinessPdf: "./01-sessions/YOUR-EXACT-FILENAME.pdf", // <-- Replace with your exact folder & filename
+        minutesPdf: "./01-sessions/YOUR-MINUTES-FILENAME.pdf",
+        highlights: [
+          "Order of Business and Calendered Matters",
+          "Committee Referrals and Plenary Deliberations"
+        ]
+      }
+    ];
     function App() {
       // --- BUILT-IN MEMBER ACCESS LOCK ---
       const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -338,6 +350,14 @@
               }`}
             >
               Legislative Docket ({filteredItems.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab('sessions')}
+              className={`pb-2.5 px-1 border-b-2 transition-all ${
+                activeTab === 'sessions' ? 'border-amber-600 text-amber-800' : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Weekly Sessions ({WEEKLY_SESSIONS.length})
             </button>
             <button 
               onClick={() => setActiveTab('committees')}

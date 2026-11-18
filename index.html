@@ -425,7 +425,47 @@ const WEEKLY_SESSIONS = [
 
           {/* MAIN TAB BODIES */}
           <main className="flex-1 p-4 bg-slate-50">
+{/* WEEKLY SESSIONS TAB */}
+            {activeTab === 'sessions' && (
+              <div className="space-y-3">
+                {WEEKLY_SESSIONS.map((session, index) => (
+                  <div key={index} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <div>
+                        <span className="font-bold text-sm text-slate-900 block">{session.sessionNo}</span>
+                        <span className="text-xs text-slate-500">📅 {session.date}</span>
+                      </div>
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        {session.status}
+                      </span>
+                    </div>
 
+                    <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                      {session.highlights.map((h, i) => <li key={i}>{h}</li>)}
+                    </ul>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                      <a 
+                        href={session.orderOfBusinessPdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold shadow-sm"
+                      >
+                        📄 Open Order of Business (PDF)
+                      </a>
+                      <a 
+                        href={session.minutesPdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-300"
+                      >
+                        📋 Open Minutes (PDF)
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             {/* TAB 1: DOCKET CARDS */}
             {activeTab === 'docket' && (
               <div className="space-y-3">
